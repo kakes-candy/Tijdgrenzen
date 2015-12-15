@@ -14,7 +14,7 @@ draw_graph = function (selectie) {
 
     
     
-d3.csv("data.csv", function (d) {
+d3.csv("./data/data.csv", function (d) {
     return {
     diagnose: d.diagnose,
     id : +d.id, 
