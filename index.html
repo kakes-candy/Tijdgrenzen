@@ -10,10 +10,77 @@
 
 
 <body>
-<script src="//d3js.org/d3.v3.min.js"></script>
-<script src = "./js_data_viz/graphs.js"> </script>
+<script src="./d3/d3.js"></script>
 
 
+   
+<div class = "row" > 
+ <div class ="large-12 columns", id = "header"></div>
+    <h3>Tijdvakken BGGZ</h3>
+  </div>   
+   
+
+<div class="row">
+    
+<div class="large-5 columns">
+    <div class="row">
+      
+       <div class="large-2 columns">
+        <h6>onvolledig behandeltraject</h6>   
+       </div>
+        <div class="large-10 columns", id="graph_onvolledig"></div>
+        
+        <div class="large-2 columns">
+        <h6>kort</h6> 
+       </div>
+        <div class="large-10 columns", id="graph_panel2"></div>
+        
+           
+        <div class="large-2 columns">
+            <h6>middel</h6>
+        </div>
+        <div class="large-10 columns", id="graph_panel3"></div>
+        
+        <div class="large-2 columns">
+            <h6>intensief</h6>
+        </div>
+        <div class="large-10 columns", id="graph_panel4"></div>
+        
+        
+        <div class="large-2 columns">
+            <h6>zeer intensief</h6>
+        </div>
+         <div class="large-10 columns", id="graph_panel5"></div>
+    </div>
+    
+</div>    
+
+<div class="large-7 columns">
+
+  
+<div class="row">
+ <div class="medium-12 columns", id='slider'>
+   <table id="rangeSlider" width='95%' cellspacing="0" cellpadding="0">
+       <tr>
+          
+           <td id="onvolledig">BO</td>
+           <td id="kort">BK</td>
+           <td id="middel">BM</td>
+           <td id="intensief">BI</td>
+           <td id="zeer_intensief">BZ</td>
+        
+           
+       </tr>
+       
+   </table>
+    </div>
+  </div>    
+     
+
+</div>    
+        
+                
+</div>
 
 
 
@@ -22,4 +89,6 @@
     <script src="js/vendor/what-input.min.js"></script>
     <script src="js/foundation.min.js"></script>
     <script src="js/app.js"></script>
+    <script src = "./js_data_viz/graphs.js"> </script>
+    <script src="./colResizable/colResizable-1.5.min.js"></script>
 </body>

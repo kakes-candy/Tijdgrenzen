@@ -1,3 +1,5 @@
+
+
 .bar rect {
   fill: steelblue;
   shape-rendering: crispEdges;
@@ -5,10 +7,33 @@
 
 .bar text {
   fill: #fff;
+     font-size: 0.55em;
 }
 
 .axis path, .axis line {
   fill: none;
   stroke: #000;
   shape-rendering: crispEdges;
+}
+
+.axis text {
+    font-size: 0.55em;
+}
+
+form label {
+    bottom-margin: 10;
+}
+
+
+table {
+    width: 96%;
+    margin-left: 2%;
+    margin-right: 2%;
+}
+
+
+td {
+    margin: 0px;
+    border: 1px;
+    border-style: solid;    
 }
