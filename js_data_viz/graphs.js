@@ -6,7 +6,23 @@ var graph_width = $("#graph_onvolledig").width(),
     width = graph_width - margin.left - margin.right,
     height = width/4 - margin.top - margin.bottom
 
-//console.log("gemeten maten", graph_width, width, height)
+
+
+//Er komt een tabel op de pagina, die wordt hier voor ingevuld
+var table =  d3.select("#results");
+
+var columns_merge = ["prestatie", "aantal", "tijd_totaal", "omzet"];
+
+var thead = table.append("thead")
+            .append("tr")
+            .selectAll("th")
+            .data(columns_merge)
+            .enter()
+            .append("th")
+            .text(function (d) {return d; });
+    
+var tbody = table.append("tbody");
+var tfoot = table.append("tfoot");
 
 
 // A formatter for counts.
@@ -16,6 +32,8 @@ var formatCount = d3.format("0d");
 var databestand, 
     aangepast;
 
+
+// Om de lijnen in de grafiek te vullen hebben we eerste 
 var grenzen_initieel = [120, 400, 600, 800, 1600], 
     prestaties = ["onvolledig", "kort", "middel", "intensief", "zeer intensief"];
 
@@ -118,6 +136,7 @@ for (var i =0 ; i < databestand.length; i++) {
     aangepast[i].prestatie_nieuw = aanpassen(aangepast[i], grenzen_initieel);
 }
     
+
     
 
     
@@ -190,8 +209,6 @@ svg_bggz.append("line")
     .style("stroke-width", 2)
     .style("stroke", "red")
     .style("fill", "none");
-    
-    
     
 
 })
@@ -287,7 +304,7 @@ var onSlide = function(e) {
 
 
 
-var table_cells = d3.selectAll("td")
+var table_cells = d3.select('#rangeSlider').selectAll("td")
     .data(bovengrenzen)
     .style('width', function (d) {return x_slider(d) + 'px'})
 
@@ -310,6 +327,7 @@ var samenvatten = function (data){
     
     var samengevat = d3.nest()
                         .key(function (d) {return d.prestatie})
+                        .sortKeys(function(a,b) { return prestaties.indexOf(a) - prestaties.indexOf(b); })
                         .rollup(function (e) {
                             return {
                                 'aantal': e.length,
@@ -319,9 +337,145 @@ var samenvatten = function (data){
                         })
                         .entries(data);
     
-    return samengevat;
+    
+    
+    //samengevatte data plat maken
+    var samengevat_plat = [], i;
+    
+    for(i = 0; i < samengevat.length; i++){
+    // de eerste waarde is de key
+        
+    samengevat_plat.push([samengevat[i].key]);
+    
+    var waarden = samengevat[i].values,
+        waarden_arr = Object.keys(waarden).map(function (keys) {return waarden[keys];});
+        
+        $.merge(samengevat_plat[i], waarden_arr);
+    
+    }
+    
+
+    var totaal = d3.nest()
+                .rollup(function (e) {
+                        return {
+                            'prestatie': 'totaal',
+                            'aantal': e.length,
+                            'tijd_totaal': d3.sum(e, function (g) {return g.tijd;}),
+                            'omzet': d3.sum(e, function (g) {return g.prijs;})
+                        }
+                    })
+                .entries(data);
+
+    
+    samengevat_plat.push(Object.keys(totaal).map(function (keys) {return totaal[keys];}));
+    
+    
+    return samengevat_plat;
     
 }
+
+
+
+
+
+
+
+
+
+
+
+
+// Define function to update data
+var update = function (databestand) {
+
+    //console.log("table update started", databestand)
+        
+    //platte data maken, geeft een array die flat heet    
+    var flat = samenvatten(databestand);
+
+    var first = flat.slice(0, flat.length-1);
+    
+    
+    var rows = tbody.selectAll('tr').data(first, function (d) {return d; });
+
+    //////////////////////////////////////////
+    // ROW UPDATE SELECTION
+
+    // Update cells in existing rows.
+    var cells = rows.selectAll('td').data(function (d) {return d; });
+
+    cells.attr('class', 'update');
+
+    // Cells enter selection
+    cells.enter().append('td')
+        .style('opacity', 0.0)
+        .attr('class', 'enter')
+        .transition()
+        .delay(900)
+        .duration(500)
+        .style('opacity', 1.0);
+
+    cells.text(function (d) {return d; });
+
+    // Cells exit selection
+    cells.exit()
+        .attr('class', 'exit')
+        .transition()
+        .delay(200)
+        .duration(500)
+        .style('opacity', 0.0)
+        .remove();
+
+    //////////////////////////////////////////
+    // ROW ENTER SELECTION
+    // Add new rows
+    var cells_in_new_rows = rows.enter().append('tr')
+                                .selectAll('td')
+                                .data(function (d) {return d; });
+
+    cells_in_new_rows.enter().append('td')
+        .style('opacity', 0.0)
+        .attr('class', 'enter')
+        .transition()
+        .delay(900)
+        .duration(500)
+        .style('opacity', 1.0);
+
+    cells_in_new_rows.text(function (d) {return d; });
+
+    /////////////////////////////////////////
+    // ROW EXIT SELECTION
+    // Remove old rows
+    rows.exit()
+        .attr('class', 'exit')
+        .transition()
+        .delay(200)
+        .duration(500)
+        .style('opacity', 0.0)
+        .remove();
+
+    tbody.selectAll('tr').select('td').classed('row-header', true);
+        
+    
+    //CLEAR FOOTER ROW
+    var tfoot_clear = d3.select("tfoot").select("tr").remove();
+    
+    //APPEND NEW ROW
+    var tfoot_row = tfoot.append("tr");
+
+    //data voor totaal
+    var last = flat.slice(flat.length-1, flat.length); 
+    
+    //ENTER NEW CELLS
+    var tfoot_cells = tfoot_row.selectAll("td")
+                               .data(last[0])
+                               .enter()
+                               .append("td")
+                               .text(function (d) {return d; });
+    
+}
+
+
 
 
 
